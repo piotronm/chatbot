@@ -1,0 +1,13 @@
+{
+  "content": {
+    "INSIGHT_NAME": {
+      "O": "Discuss Bank of America checking",
+      "1": "Client trending towards digital inactivity"
+    },
+    "INSIGHT_DESCRIPTION": {
+      "0": "Eligible for $300 checking offer",
+      "1": "Last login greater than 60 days"
+    }
+  },
+  "type": "insight"
+}
