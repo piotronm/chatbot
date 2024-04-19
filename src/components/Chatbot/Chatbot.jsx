@@ -1,10 +1,23 @@
 import React, { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import axios from "axios";
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  List,
+  ListItem,
+  ListItemIcon,
+} from "@mui/material";
+import { Done } from "@mui/icons-material";
 
 const Chatbot = () => {
   const [question, setQuestion] = useState("");
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isEmpty, setIsEmpty] = useState(false);
@@ -23,7 +36,7 @@ const Chatbot = () => {
     }
     setLoading(true);
     axios
-      .get("/data2.json")
+      .get("/data.json")
       .then((response) => {
         const data = response.data;
         console.log("API response received:", data);
@@ -47,34 +60,51 @@ const Chatbot = () => {
 
   const renderContent = () => {
     if (!response || !response.content) {
-      return <p className="chatbot-response">No data available</p>;
+      return <p>No data available</p>;
     }
 
     if (response.type === "jira") {
-      return <p className="chatbot-response">{response.content}</p>;
+      return <p>{response.content}</p>;
     }
-    // If type is not "jira" (assumed to be "insight"), render as object
+
+    // Render content as Material-UI table
+    const content = response.content;
+    const keys = Object.keys(content);
+    const values = Object.values(content);
+
     return (
-      <div>
-        {Object.entries(response.content).map(([key, value]) => (
-          <div key={key}>
-            <h3>{key}</h3>
-            <ul>
-              {Object.entries(value).map(([innerKey, innerValue]) => (
-                <li key={innerKey}>
-                  {innerKey}: {innerValue}
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
+      <TableContainer component={Paper}>
+        <Table aria-label="Insights table">
+          <TableHead></TableHead>
+          <TableBody>
+            {keys.map((key, index) => (
+              <TableRow key={index}>
+                <TableCell>{key}</TableCell>
+                <TableCell>
+                  <List>
+                    {Object.entries(values[index]).map(
+                      ([innerKey, innerValue]) => (
+                        <ListItem key={innerKey}>
+                          <ListItemIcon>
+                            <Done />
+                          </ListItemIcon>
+                          {innerValue}
+                        </ListItem>
+                      )
+                    )}
+                  </List>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     );
   };
 
   return (
     <div>
-      <form className="chatbot-form" onSubmit={handleQuestionSubmit}>
+      <form onSubmit={handleQuestionSubmit}>
         <TextField
           id="standard-search"
           label="Enter Your Question Here"
@@ -86,10 +116,8 @@ const Chatbot = () => {
         />
       </form>
       {loading && <p>Loading...</p>}
-      {error && <p className="chatbot-response">{error}</p>}
-      {submitted && isEmpty && (
-        <p className="error-message">Please enter a question.</p>
-      )}
+      {error && <p>{error}</p>}
+      {submitted && isEmpty && <p>Please enter a question.</p>}
       {renderContent()}
     </div>
   );
