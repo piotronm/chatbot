@@ -1,0 +1,5 @@
+{
+    "content": "Check if the host name is removed as the user is logging into cew with NBK (same ID logged into machine). If yes, then issue resolved and able to launch container in pll with nbk. If not, then run \"Clear Superstation Files & Settings\" from the utilities start menu. If CEW on SE is launching and crashing, then check if the SE environment is down. Issue will be fixed once environment is up and running.",
+    "type": "jira"
+  }
+  
