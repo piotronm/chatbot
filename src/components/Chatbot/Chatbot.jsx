@@ -39,9 +39,10 @@ const Chatbot = () => {
     }
     setLoading(true);
 
-    // POST request to send the user's question
+    // POST request
+    console.log("Data sent to the server:", { Query: query });
     axios
-      .post("http://127.0.0.1:5000/chat", { query: query })
+      .post("http://127.0.0.1:5000/chat", { Query: query })
       .then((response) => {
         const data = response.data;
         console.log("API response received:", data);
@@ -64,6 +65,10 @@ const Chatbot = () => {
   };
 
   const renderContent = () => {
+    if (loading) {
+      return null;
+    }
+
     if (
       (submitted && !response) ||
       (response && response.type === "insight" && !response.content) ||
