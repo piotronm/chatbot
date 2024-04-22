@@ -93,6 +93,29 @@ const Chatbot = () => {
       );
     }
 
+    if (response && response.type === "insight") {
+      if (
+        response.content ===
+        "Sorry, I am not able to handle the query, please use filter or reach out assistant"
+      ) {
+        return (
+          <div>
+            {submitted && (
+              <ListItem>
+                <ListItemIcon>
+                  <Avatar />
+                </ListItemIcon>
+                <span>{question}</span>
+              </ListItem>
+            )}
+            <p>{response.content}</p>
+          </div>
+        );
+      } else {
+        // Handle other types of insight content normally
+      }
+    }
+
     const content = response && response.content;
     const keys = content ? Object.keys(content) : [];
     const values = content ? Object.values(content) : [];
