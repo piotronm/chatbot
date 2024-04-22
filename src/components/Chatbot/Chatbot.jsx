@@ -12,8 +12,11 @@ import {
   List,
   ListItem,
   ListItemIcon,
+  Box,
+  Avatar,
 } from "@mui/material";
 import { Done } from "@mui/icons-material";
+import { BeatLoader } from "react-spinners";
 
 const Chatbot = () => {
   const [question, setQuestion] = useState("");
@@ -36,7 +39,7 @@ const Chatbot = () => {
     }
     setLoading(true);
     axios
-      .get("/data.json")
+      .get("/data3.json")
       .then((response) => {
         const data = response.data;
         console.log("API response received:", data);
@@ -59,52 +62,88 @@ const Chatbot = () => {
   };
 
   const renderContent = () => {
-    if (!response || !response.content) {
+    if (
+      (submitted && !response) ||
+      (response && response.type === "insight" && !response.content) ||
+      (response && response.type === "jira" && !response.content)
+    ) {
       return <p>No data available</p>;
     }
 
-    if (response.type === "jira") {
-      return <p>{response.content}</p>;
+    if (response && response.type === "jira") {
+      return (
+        <div>
+          {submitted && (
+            <ListItem>
+              <ListItemIcon>
+                <Avatar />
+              </ListItemIcon>
+              <span>{question}</span>
+            </ListItem>
+          )}
+          <p>{response.content}</p>
+        </div>
+      );
     }
 
-    // Render content as Material-UI table
-    const content = response.content;
-    const keys = Object.keys(content);
-    const values = Object.values(content);
+    const content = response && response.content;
+    const keys = content ? Object.keys(content) : [];
+    const values = content ? Object.values(content) : [];
 
     return (
-      <TableContainer component={Paper}>
-        <Table aria-label="Insights table">
-          <TableHead></TableHead>
-          <TableBody>
-            {keys.map((key, index) => (
-              <TableRow key={index}>
-                <TableCell>{key}</TableCell>
-                <TableCell>
-                  <List>
-                    {Object.entries(values[index]).map(
-                      ([innerKey, innerValue]) => (
-                        <ListItem key={innerKey}>
-                          <ListItemIcon>
-                            <Done />
-                          </ListItemIcon>
-                          {innerValue}
-                        </ListItem>
-                      )
-                    )}
-                  </List>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <div>
+        {submitted && (
+          <ListItem>
+            <ListItemIcon>
+              <Avatar />
+            </ListItemIcon>
+            <span>{question}</span>
+          </ListItem>
+        )}
+        <TableContainer component={Paper}>
+          <Table aria-label="Insights table">
+            <TableHead></TableHead>
+            <TableBody>
+              {keys.map((key, index) => (
+                <TableRow key={index}>
+                  <TableCell>{key}</TableCell>
+                  <TableCell>
+                    <List>
+                      {Object.entries(values[index]).map(
+                        ([innerKey, innerValue]) => (
+                          <ListItem key={innerKey}>
+                            <ListItemIcon>
+                              <Done />
+                            </ListItemIcon>
+                            {innerValue}
+                          </ListItem>
+                        )
+                      )}
+                    </List>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
     );
   };
 
   return (
     <div>
-      <form onSubmit={handleQuestionSubmit}>
+      {renderContent()}
+      <Box
+        component="form"
+        onSubmit={handleQuestionSubmit}
+        sx={{
+          position: "fixed",
+          bottom: 0,
+          width: "100%",
+          bgcolor: "background.paper",
+          p: 2,
+        }}
+      >
         <TextField
           id="standard-search"
           label="Enter Your Question Here"
@@ -114,11 +153,10 @@ const Chatbot = () => {
           maxLength={250}
           autoFocus
         />
-      </form>
-      {loading && <p>Loading...</p>}
+      </Box>
+      {loading && <BeatLoader color="blue" />}
       {error && <p>{error}</p>}
       {submitted && isEmpty && <p>Please enter a question.</p>}
-      {renderContent()}
     </div>
   );
 };
