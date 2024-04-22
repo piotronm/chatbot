@@ -39,27 +39,9 @@ const Chatbot = () => {
     }
     setLoading(true);
 
-    // POST request
-    console.log("Data sent to the server:", { Query: query });
+    // POST request to send the user's question
     axios
-      .post("/data.json", { Query: query })
-      .then((response) => {
-        const data = response.data;
-        console.log("API response received:", data);
-        setResponse(data);
-        setError(null);
-      })
-      .catch((error) => {
-        console.error("API Error:", error);
-        setError("Failed to fetch data. Please try again later.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-
-    // GET request
-    axios
-      .get("/data.json")
+      .post("http://127.0.0.1:5000/chat", { query: query })
       .then((response) => {
         const data = response.data;
         console.log("API response received:", data);
