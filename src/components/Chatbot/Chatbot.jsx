@@ -45,22 +45,22 @@ const Chatbot = () => {
     setSubmitted(true);
     setLoading(true);
 
-    // POST request
     console.log("Data sent to the server:", { Query: query });
     axios
-      .get("data3.txt", { Query: query })
+      .get("data55.txt", { Query: query })
       .then((response) => {
         const data = response.data;
         console.log("API response received:", data);
-        setResponseHistory([
-          ...responseHistory,
+        // Append the new question and response to the existing responseHistory
+        setResponseHistory((prevHistory) => [
+          ...prevHistory,
           { question: query, response: data },
         ]);
         setError(null);
       })
       .catch((error) => {
         console.error("API Error:", error);
-        setError(true); // Set error state to true to trigger rendering the Alert
+        setError(true);
       })
       .finally(() => {
         setLoading(false);
@@ -220,8 +220,22 @@ const Chatbot = () => {
         margin: "auto", // Optional: Center align the component
       }}
     >
-      <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
+      <div style={{ position: "relative" }}>
+        {/* Render CircularProgress while loading */}
         {renderContent()}
+        {loading && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              zIndex: 9999, // Ensure CircularProgress is above other content
+            }}
+          >
+            <CircularProgress color="primary" />
+          </div>
+        )}
         <Divider />
         <Box
           component="form"
@@ -243,7 +257,6 @@ const Chatbot = () => {
             maxLength={250}
           />
         </Box>
-        {loading && <CircularProgress color="primary" />}
         {error && <p>{error}</p>}
         {submitted && isEmpty && <p>Please enter a question.</p>}
         {error && (
