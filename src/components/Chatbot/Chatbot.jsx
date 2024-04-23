@@ -45,28 +45,31 @@ const Chatbot = () => {
     setSubmitted(true);
     setLoading(true);
 
-    console.log("Data sent to the server:", { Query: query });
-    axios
-      .get("data55.txt", { Query: query })
-      .then((response) => {
-        const data = response.data;
-        console.log("API response received:", data);
-        // Append the new question and response to the existing responseHistory
-        setResponseHistory((prevHistory) => [
-          ...prevHistory,
-          { question: query, response: data },
-        ]);
-        setError(null);
-      })
-      .catch((error) => {
-        console.error("API Error:", error);
-        setError(true);
-      })
-      .finally(() => {
-        setLoading(false);
-        setQuestion("");
-        setIsEmpty(false);
-      });
+    // Simulate API call delay
+    setTimeout(() => {
+      // Simulate API response
+      axios
+        .get("data3.txt", { Query: query })
+        .then((response) => {
+          const data = response.data;
+          console.log("API response received:", data);
+          // Append the new question and response to the existing responseHistory
+          setResponseHistory((prevHistory) => [
+            ...prevHistory,
+            { question: query, response: data },
+          ]);
+          setError(null);
+        })
+        .catch((error) => {
+          console.error("API Error:", error);
+          setError(true);
+        })
+        .finally(() => {
+          setLoading(false);
+          setQuestion("");
+          setIsEmpty(false);
+        });
+    }, 2000); // Simulate a 2-second delay
   };
 
   const handleQuestionChange = (event) => {
@@ -107,10 +110,6 @@ const Chatbot = () => {
   };
 
   const renderContent = () => {
-    if (loading) {
-      return null;
-    }
-
     if (submitted && responseHistory.length === 0) {
       return <p>No data available</p>;
     }
@@ -213,59 +212,58 @@ const Chatbot = () => {
   return (
     <Box
       sx={{
-        border: "1px solid rgba(0, 0, 0, 0.12)", // Soft border
-        borderRadius: "8px", // Optional: Add border radius for rounded corners
-        padding: "20px", // Optional: Add padding for content
-        maxWidth: "600px", // Optional: Set maximum width
-        margin: "auto", // Optional: Center align the component
+        border: "1px solid rgba(0, 0, 0, 0.12)",
+        borderRadius: "8px",
+        padding: "20px",
+        maxWidth: "600px",
+        margin: "auto",
+        position: "relative", // Ensure positioning context
       }}
     >
-      <div style={{ position: "relative" }}>
-        {/* Render CircularProgress while loading */}
-        {renderContent()}
+      {/* Render chat history */}
+      {renderContent()}
+
+      {/* Form for submitting questions */}
+      <Divider />
+      <Box
+        component="form"
+        onSubmit={handleQuestionSubmit}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          marginTop: "20px",
+        }}
+      >
+        <TextField
+          fullWidth
+          id="standard-search"
+          label="Enter Your Question Here"
+          value={question}
+          onChange={handleQuestionChange}
+          type="text"
+          variant="standard"
+          maxLength={250}
+        />
         {loading && (
           <div
             style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              zIndex: 9999, // Ensure CircularProgress is above other content
+              marginLeft: "10px", // Add spacing between the text field and spinner
             }}
           >
             <CircularProgress color="primary" />
           </div>
         )}
-        <Divider />
-        <Box
-          component="form"
-          onSubmit={handleQuestionSubmit}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            marginTop: "20px",
-          }}
-        >
-          <TextField
-            fullWidth
-            id="standard-search"
-            label="Enter Your Question Here"
-            value={question}
-            onChange={handleQuestionChange}
-            type="text"
-            variant="standard"
-            maxLength={250}
-          />
-        </Box>
-        {error && <p>{error}</p>}
-        {submitted && isEmpty && <p>Please enter a question.</p>}
-        {error && (
-          <Alert severity="error" style={{ marginBottom: "20px" }}>
-            <AlertTitle>Error</AlertTitle>
-            Failed to fetch data. Please try again later.
-          </Alert>
-        )}
-      </div>
+      </Box>
+
+      {/* Error and submission feedback */}
+      {error && <p>{error}</p>}
+      {submitted && isEmpty && <p>Please enter a question.</p>}
+      {error && (
+        <Alert severity="error" style={{ marginBottom: "20px" }}>
+          <AlertTitle>Error</AlertTitle>
+          Failed to fetch data. Please try again later.
+        </Alert>
+      )}
     </Box>
   );
 };
