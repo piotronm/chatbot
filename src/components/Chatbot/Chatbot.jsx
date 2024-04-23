@@ -255,9 +255,27 @@ const Chatbot = () => {
             value={question}
             onChange={handleQuestionChange}
             type="text"
-            variant="standard"
+            variant="outlined" // Change variant to "outlined" for a more contrasting border
             maxLength={250}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                // Target the root element of the outlined input
+                "& fieldset": {
+                  // Style the fieldset, which is the border
+                  borderColor: "rgba(0, 0, 0, 0.23)", // Change border color
+                },
+                "&:hover fieldset": {
+                  // Style the fieldset on hover
+                  borderColor: "rgba(0, 0, 0, 0.45)", // Change border color on hover
+                },
+                "&.Mui-focused fieldset": {
+                  // Style the fieldset when focused
+                  borderColor: "#2979FF", // Change border color when focused
+                },
+              },
+            }}
           />
+
           {loading && (
             <div style={{ marginLeft: "10px" }}>
               <CircularProgress color="primary" />
