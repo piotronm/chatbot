@@ -5,6 +5,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableHead,
   TableContainer,
   TableRow,
   Paper,
@@ -43,7 +44,7 @@ const Chatbot = () => {
     // POST request
     console.log("Data sent to the server:", { Query: query });
     axios
-      .get("data5.txt", { Query: query })
+      .get("data4ss.txt", { Query: query })
       .then((response) => {
         const data = response.data;
         console.log("API response received:", data);
@@ -151,16 +152,27 @@ const Chatbot = () => {
                         )}
                         <TableContainer component={Paper}>
                           <Table aria-label="Insights table">
+                            <TableHead>
+                              <TableRow>
+                                {Object.keys(
+                                  JSON.parse(entry.response.content)
+                                ).map((key, i) => (
+                                  <TableCell key={i}>
+                                    {key.replace(/_/g, " ")}{" "}
+                                    {/* Replace underscores with spaces */}
+                                  </TableCell>
+                                ))}
+                              </TableRow>
+                            </TableHead>
                             <TableBody>
-                              {Object.entries(
-                                JSON.parse(entry.response.content)
-                              ).map(([key, value], i) => (
-                                <TableRow key={i}>
-                                  <TableCell>{key}</TableCell>
-                                  <TableCell>
+                              <TableRow>
+                                {Object.values(
+                                  JSON.parse(entry.response.content)
+                                ).map((value, i) => (
+                                  <TableCell key={i}>
                                     <List>
-                                      {Object.entries(value).map(
-                                        ([innerKey, innerValue], j) => (
+                                      {Object.values(value).map(
+                                        (innerValue, j) => (
                                           <ListItem key={j}>
                                             <ListItemIcon>
                                               <Done />
@@ -171,8 +183,8 @@ const Chatbot = () => {
                                       )}
                                     </List>
                                   </TableCell>
-                                </TableRow>
-                              ))}
+                                ))}
+                              </TableRow>
                             </TableBody>
                           </Table>
                         </TableContainer>
