@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import TextField from "@mui/material/TextField";
 import axios from "axios";
 import {
@@ -18,6 +18,8 @@ import {
 } from "@mui/material";
 import { Done } from "@mui/icons-material";
 import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 
 const Chatbot = () => {
   const [question, setQuestion] = useState("");
@@ -26,9 +28,11 @@ const Chatbot = () => {
   const [error, setError] = useState(null);
   const [isEmpty, setIsEmpty] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const bottomRef = useRef(null);
 
   useEffect(() => {
     console.log("Response History:", responseHistory);
+    scrollToBottom();
   }, [responseHistory]);
 
   const handleQuestionSubmit = (event) => {
@@ -41,28 +45,31 @@ const Chatbot = () => {
     setSubmitted(true);
     setLoading(true);
 
-    // POST request
-    console.log("Data sent to the server:", { Query: query });
-    axios
-      .get("data4ss.txt", { Query: query })
-      .then((response) => {
-        const data = response.data;
-        console.log("API response received:", data);
-        setResponseHistory([
-          ...responseHistory,
-          { question: query, response: data },
-        ]);
-        setError(null);
-      })
-      .catch((error) => {
-        console.error("API Error:", error);
-        setError("Failed to fetch data. Please try again later.");
-      })
-      .finally(() => {
-        setLoading(false);
-        setQuestion("");
-        setIsEmpty(false);
-      });
+    // Simulate API call delay
+    setTimeout(() => {
+      // Simulate API response
+      axios
+        .get("data5.txt", { Query: query }) //change to .post and correct api
+        .then((response) => {
+          const data = response.data;
+          console.log("API response received:", data);
+          // Append the new question and response to the existing responseHistory
+          setResponseHistory((prevHistory) => [
+            ...prevHistory,
+            { question: query, response: data },
+          ]);
+          setError(null);
+        })
+        .catch((error) => {
+          console.error("API Error:", error);
+          setError(true);
+        })
+        .finally(() => {
+          setLoading(false);
+          setQuestion("");
+          setIsEmpty(false);
+        });
+    }, 2000); // Simulate a 2-second delay
   };
 
   const handleQuestionChange = (event) => {
@@ -71,9 +78,14 @@ const Chatbot = () => {
     setQuestion(event.target.value);
   };
 
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: "auto" });
+  };
+
   const renderChatMessage = (message, isUser) => {
     return (
       <ListItem
+        ref={bottomRef}
         style={{
           alignSelf: isUser ? "flex-end" : "flex-start",
           marginBottom: "8px",
@@ -85,9 +97,10 @@ const Chatbot = () => {
             color: isUser ? "#FFFFFF" : "#000000",
             borderRadius: "10px",
             padding: "8px 12px",
-            // Align user message to the right
             marginLeft: isUser ? "auto" : 0,
             marginRight: isUser ? 0 : "auto",
+            overflowWrap: "break-word",
+            maxWidth: "80%", // Set a maximum width for the chat bubble
           }}
         >
           <Typography>{message}</Typography>
@@ -97,10 +110,6 @@ const Chatbot = () => {
   };
 
   const renderContent = () => {
-    if (loading) {
-      return null;
-    }
-
     if (submitted && responseHistory.length === 0) {
       return <p>No data available</p>;
     }
@@ -201,32 +210,71 @@ const Chatbot = () => {
   };
 
   return (
-    <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
-      {renderContent()}
-      <Divider />
+    <div
+      style={{
+        position: "fixed",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: "100vh",
+        overflowY: "auto",
+      }}
+    >
       <Box
-        component="form"
-        onSubmit={handleQuestionSubmit}
         sx={{
-          display: "flex",
-          alignItems: "center",
-          marginTop: "20px",
+          border: "1px solid rgba(0, 0, 0, 0.12)",
+          borderRadius: "8px",
+          padding: "20px",
+          maxWidth: "600px",
+          margin: "auto",
+          position: "relative", // Ensure positioning context
         }}
       >
-        <TextField
-          fullWidth
-          id="standard-search"
-          label="Enter Your Question Here"
-          value={question}
-          onChange={handleQuestionChange}
-          type="text"
-          variant="standard"
-          maxLength={250}
-        />
+        {/* Render chat history */}
+        {renderContent()}
+
+        {/* Form for submitting questions */}
+        <Divider />
+        <Box
+          component="form"
+          onSubmit={handleQuestionSubmit}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            marginTop: "20px",
+            position: "sticky",
+            bottom: 0,
+            backgroundColor: "#fff",
+            padding: "10px",
+          }}
+        >
+          <TextField
+            fullWidth
+            id="standard-search"
+            label="Enter Your Question Here"
+            value={question}
+            onChange={handleQuestionChange}
+            type="text"
+            variant="standard"
+            maxLength={250}
+          />
+          {loading && (
+            <div style={{ marginLeft: "10px" }}>
+              <CircularProgress color="primary" />
+            </div>
+          )}
+        </Box>
+
+        {/* Error and submission feedback */}
+        {error && <p>{error}</p>}
+        {submitted && isEmpty && <p>Please enter a question.</p>}
+        {error && (
+          <Alert severity="error" style={{ marginBottom: "20px" }}>
+            <AlertTitle>Error</AlertTitle>
+            Failed to fetch data. Please try again later.
+          </Alert>
+        )}
       </Box>
-      {loading && <CircularProgress color="primary" />}
-      {error && <p>{error}</p>}
-      {submitted && isEmpty && <p>Please enter a question.</p>}
     </div>
   );
 };
