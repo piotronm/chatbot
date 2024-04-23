@@ -46,7 +46,7 @@ const Chatbot = () => {
     // POST request
     console.log("Data sent to the server:", { Query: query });
     axios
-      .get("data4.txt", { Query: query })
+      .get("data3.txt", { Query: query })
       .then((response) => {
         const data = response.data;
         console.log("API response received:", data);
@@ -203,39 +203,49 @@ const Chatbot = () => {
   };
 
   return (
-    <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
-      {renderContent()}
-      <Divider />
-      <Box
-        component="form"
-        onSubmit={handleQuestionSubmit}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          marginTop: "20px",
-        }}
-      >
-        <TextField
-          fullWidth
-          id="standard-search"
-          label="Enter Your Question Here"
-          value={question}
-          onChange={handleQuestionChange}
-          type="text"
-          variant="standard"
-          maxLength={250}
-        />
-      </Box>
-      {loading && <CircularProgress color="primary" />}
-      {error && <p>{error}</p>}
-      {submitted && isEmpty && <p>Please enter a question.</p>}
-      {error && (
-        <Alert severity="error" style={{ marginBottom: "20px" }}>
-          <AlertTitle>Error</AlertTitle>
-          Failed to fetch data. Please try again later.
-        </Alert>
-      )}
-    </div>
+    <Box
+      sx={{
+        border: "1px solid rgba(0, 0, 0, 0.12)", // Soft border
+        borderRadius: "8px", // Optional: Add border radius for rounded corners
+        padding: "20px", // Optional: Add padding for content
+        maxWidth: "600px", // Optional: Set maximum width
+        margin: "auto", // Optional: Center align the component
+      }}
+    >
+      <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
+        {renderContent()}
+        <Divider />
+        <Box
+          component="form"
+          onSubmit={handleQuestionSubmit}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            marginTop: "20px",
+          }}
+        >
+          <TextField
+            fullWidth
+            id="standard-search"
+            label="Enter Your Question Here"
+            value={question}
+            onChange={handleQuestionChange}
+            type="text"
+            variant="standard"
+            maxLength={250}
+          />
+        </Box>
+        {loading && <CircularProgress color="primary" />}
+        {error && <p>{error}</p>}
+        {submitted && isEmpty && <p>Please enter a question.</p>}
+        {error && (
+          <Alert severity="error" style={{ marginBottom: "20px" }}>
+            <AlertTitle>Error</AlertTitle>
+            Failed to fetch data. Please try again later.
+          </Alert>
+        )}
+      </div>
+    </Box>
   );
 };
 
