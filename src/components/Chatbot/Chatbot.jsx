@@ -16,27 +16,28 @@ import {
   Divider,
 } from "@mui/material";
 import { Done } from "@mui/icons-material";
-import { BeatLoader } from "react-spinners";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const Chatbot = () => {
   const [question, setQuestion] = useState("");
-  const [response, setResponse] = useState(null);
+  const [responseHistory, setResponseHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isEmpty, setIsEmpty] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    console.log("Response:", response);
-  }, [response]);
+    console.log("Response History:", responseHistory);
+  }, [responseHistory]);
 
   const handleQuestionSubmit = (event) => {
     event.preventDefault();
-    setSubmitted(true);
     const query = question.trim();
     if (!query) {
+      setIsEmpty(true);
       return;
     }
+    setSubmitted(true);
     setLoading(true);
 
     // POST request
@@ -46,7 +47,10 @@ const Chatbot = () => {
       .then((response) => {
         const data = response.data;
         console.log("API response received:", data);
-        setResponse(data);
+        setResponseHistory([
+          ...responseHistory,
+          { question: query, response: data },
+        ]);
         setError(null);
       })
       .catch((error) => {
@@ -55,6 +59,8 @@ const Chatbot = () => {
       })
       .finally(() => {
         setLoading(false);
+        setQuestion(""); // Clear input box
+        setIsEmpty(false);
       });
   };
 
@@ -94,101 +100,84 @@ const Chatbot = () => {
       return null;
     }
 
-    if (
-      (submitted && !response) ||
-      (response && response.type === "insight" && !response.content)
-    ) {
+    if (submitted && responseHistory.length === 0) {
       return <p>No data available</p>;
     }
 
-    if (response && response.type === "jira") {
-      const sentences = response.content.split(".");
-      const filteredSentences = sentences.filter(
-        (sentence) => sentence.trim() !== ""
-      );
-
-      return (
-        <div>
-          {submitted && renderChatMessage(question, true)}
-          <ListItem
-            style={{
-              alignSelf: "flex-start",
-              marginBottom: "8px",
-            }}
-          >
-            <Box
-              sx={{
-                bgcolor: "#F0F0F0",
-                color: "#000000",
-                borderRadius: "10px",
-                padding: "8px 12px",
-              }}
-            >
-              {filteredSentences.map((sentence, index) => (
-                <div key={index}>
-                  <Typography>{sentence.trim()}</Typography>
-                </div>
-              ))}
-            </Box>
-          </ListItem>
-        </div>
-      );
-    }
-
-    if (response && response.type === "insight") {
-      if (
-        response.content ===
-        "Sorry, I am not able to handle the query, please use filter or reach out assistant"
-      ) {
-        return (
-          <div>
-            {submitted && renderChatMessage(question, true)}
-            {renderChatMessage(response.content, false)}
-          </div>
-        );
-      } else {
-        const content = JSON.parse(response.content);
-        const keys = Object.keys(content);
-        const values = Object.values(content);
-
-        return (
-          <div>
-            {submitted && renderChatMessage(question, true)}
-            {renderChatMessage("Here is the Client Insight data:", false)}
-            <TableContainer component={Paper}>
-              <Table aria-label="Insights table">
-                <TableBody>
-                  {keys.map((key, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{key}</TableCell>
-                      <TableCell>
-                        <List>
-                          {Object.entries(values[index]).map(
-                            ([innerKey, innerValue]) => (
-                              <ListItem key={innerKey}>
-                                <ListItemIcon>
-                                  <Done />
-                                </ListItemIcon>
-                                {innerValue}
-                              </ListItem>
+    return (
+      <List>
+        {responseHistory.map((entry, index) => (
+          <div key={index}>
+            {renderChatMessage(entry.question, true)}
+            {entry.response.type === "jira" ? (
+              <ListItem
+                style={{
+                  alignSelf: "flex-start",
+                  marginBottom: "8px",
+                }}
+              >
+                <Box
+                  sx={{
+                    bgcolor: "#F0F0F0",
+                    color: "#000000",
+                    borderRadius: "10px",
+                    padding: "8px 12px",
+                  }}
+                >
+                  {entry.response.content.split(".").map((sentence, i) => (
+                    <Typography key={i}>{sentence.trim()}</Typography>
+                  ))}
+                </Box>
+              </ListItem>
+            ) : (
+              <div>
+                {renderChatMessage(entry.response.content, false)}
+                {entry.response.type === "insight" && (
+                  <div>
+                    {renderChatMessage(
+                      "Here is the Client Insight data:",
+                      false
+                    )}
+                    <TableContainer component={Paper}>
+                      <Table aria-label="Insights table">
+                        <TableBody>
+                          {Object.entries(entry.response.content).map(
+                            ([key, value], i) => (
+                              <TableRow key={i}>
+                                <TableCell>{key}</TableCell>
+                                <TableCell>
+                                  <List>
+                                    {Object.entries(value).map(
+                                      ([innerKey, innerValue], j) => (
+                                        <ListItem key={j}>
+                                          <ListItemIcon>
+                                            <Done />
+                                          </ListItemIcon>
+                                          {innerValue}
+                                        </ListItem>
+                                      )
+                                    )}
+                                  </List>
+                                </TableCell>
+                              </TableRow>
                             )
                           )}
-                        </List>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        );
-      }
-    }
+        ))}
+      </List>
+    );
   };
 
   return (
     <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
-      <List>{renderContent()}</List>
+      {renderContent()}
       <Divider />
       <Box
         component="form"
@@ -203,13 +192,14 @@ const Chatbot = () => {
           fullWidth
           id="standard-search"
           label="Enter Your Question Here"
+          value={question}
           onChange={handleQuestionChange}
           type="text"
           variant="standard"
           maxLength={250}
         />
       </Box>
-      {loading && <BeatLoader color="blue" />}
+      {loading && <CircularProgress color="primary" />}
       {error && <p>{error}</p>}
       {submitted && isEmpty && <p>Please enter a question.</p>}
     </div>
