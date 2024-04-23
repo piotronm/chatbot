@@ -43,7 +43,7 @@ const Chatbot = () => {
     // POST request
     console.log("Data sent to the server:", { Query: query });
     axios
-      .get("data5.txt", { Query: query })
+      .get("data4.txt", { Query: query })
       .then((response) => {
         const data = response.data;
         console.log("API response received:", data);
@@ -108,7 +108,10 @@ const Chatbot = () => {
       <List>
         {responseHistory.map((entry, index) => (
           <div key={index}>
-            {renderChatMessage(entry.question, true)}
+            {entry.response.type === "insight" &&
+              entry.response.content !==
+                "Sorry, I am not able to handle the query, please use filter or reach out assistant" &&
+              renderChatMessage(entry.question, true)}
             {entry.response.type === "jira" ? (
               <ListItem
                 style={{
@@ -131,13 +134,17 @@ const Chatbot = () => {
               </ListItem>
             ) : (
               <div>
-                {renderChatMessage(entry.response.content, false)}
                 {entry.response.type === "insight" && (
                   <div>
-                    {renderChatMessage(
-                      "Here is the Client Insight data:",
-                      false
-                    )}
+                    {entry.response.content ===
+                      "Sorry, I am not able to handle the query, please use filter or reach out assistant" &&
+                      renderChatMessage(entry.response.content, false)}
+                    {entry.response.content !==
+                      "Sorry, I am not able to handle the query, please use filter or reach out assistant" &&
+                      renderChatMessage(
+                        "Here is the Client Insight data:",
+                        false
+                      )}
                     <TableContainer component={Paper}>
                       <Table aria-label="Insights table">
                         <TableBody>
