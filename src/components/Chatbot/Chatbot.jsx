@@ -18,6 +18,8 @@ import {
 } from "@mui/material";
 import { Done } from "@mui/icons-material";
 import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 
 const Chatbot = () => {
   const [question, setQuestion] = useState("");
@@ -44,7 +46,7 @@ const Chatbot = () => {
     // POST request
     console.log("Data sent to the server:", { Query: query });
     axios
-      .get("data4ss.txt", { Query: query })
+      .get("data4.txt", { Query: query })
       .then((response) => {
         const data = response.data;
         console.log("API response received:", data);
@@ -56,7 +58,7 @@ const Chatbot = () => {
       })
       .catch((error) => {
         console.error("API Error:", error);
-        setError("Failed to fetch data. Please try again later.");
+        setError(true); // Set error state to true to trigger rendering the Alert
       })
       .finally(() => {
         setLoading(false);
@@ -227,6 +229,12 @@ const Chatbot = () => {
       {loading && <CircularProgress color="primary" />}
       {error && <p>{error}</p>}
       {submitted && isEmpty && <p>Please enter a question.</p>}
+      {error && (
+        <Alert severity="error" style={{ marginBottom: "20px" }}>
+          <AlertTitle>Error</AlertTitle>
+          Failed to fetch data. Please try again later.
+        </Alert>
+      )}
     </div>
   );
 };
