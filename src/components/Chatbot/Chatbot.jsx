@@ -11,12 +11,10 @@ import {
   Paper,
   List,
   ListItem,
-  ListItemIcon,
   Box,
   Typography,
   Divider,
 } from "@mui/material";
-import { Done } from "@mui/icons-material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
@@ -159,41 +157,51 @@ const Chatbot = () => {
                           "Here is the Client Insight data:",
                           false
                         )}
-                        <TableContainer component={Paper}>
+                        <TableContainer
+                          component={Paper}
+                          sx={{
+                            marginTop: "20px",
+                            border: "1px solid rgba(0, 0, 0, 0.12)",
+                          }}
+                        >
                           <Table aria-label="Insights table">
                             <TableHead>
-                              <TableRow>
+                              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
                                 {Object.keys(
                                   JSON.parse(entry.response.content)
                                 ).map((key, i) => (
-                                  <TableCell key={i}>
-                                    {key.replace(/_/g, " ")}{" "}
-                                    {/* Replace underscores with spaces */}
+                                  <TableCell
+                                    key={i}
+                                    sx={{
+                                      border: "1px solid rgba(0, 0, 0, 0.12)",
+                                      fontWeight: "bold",
+                                      color: "#333333",
+                                    }}
+                                  >
+                                    {key.replace(/_/g, " ")}
                                   </TableCell>
                                 ))}
                               </TableRow>
                             </TableHead>
                             <TableBody>
-                              <TableRow>
-                                {Object.values(
-                                  JSON.parse(entry.response.content)
-                                ).map((value, i) => (
-                                  <TableCell key={i}>
-                                    <List>
-                                      {Object.values(value).map(
-                                        (innerValue, j) => (
-                                          <ListItem key={j}>
-                                            <ListItemIcon>
-                                              <Done />
-                                            </ListItemIcon>
-                                            {innerValue}
-                                          </ListItem>
-                                        )
-                                      )}
-                                    </List>
-                                  </TableCell>
-                                ))}
-                              </TableRow>
+                              {Object.values(
+                                JSON.parse(entry.response.content)
+                              ).map((value, i) => (
+                                <TableRow key={i}>
+                                  {Object.values(value).map((innerValue, j) => (
+                                    <TableCell
+                                      key={j}
+                                      sx={{
+                                        border: "1px solid rgba(0, 0, 0, 0.12)",
+                                        padding: "8px",
+                                        color: "#555555",
+                                      }}
+                                    >
+                                      {innerValue}
+                                    </TableCell>
+                                  ))}
+                                </TableRow>
+                              ))}
                             </TableBody>
                           </Table>
                         </TableContainer>
