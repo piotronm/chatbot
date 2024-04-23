@@ -101,7 +101,7 @@ const Chatbot = () => {
             maxWidth: "80%", // Set a maximum width for the chat bubble
           }}
         >
-          <Typography>{message}</Typography>
+          <Typography variant="body1">{message}</Typography>
         </Box>
       </ListItem>
     );
