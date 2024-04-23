@@ -87,9 +87,10 @@ const Chatbot = () => {
             color: isUser ? "#FFFFFF" : "#000000",
             borderRadius: "10px",
             padding: "8px 12px",
-            // Align user message to the right
             marginLeft: isUser ? "auto" : 0,
             marginRight: isUser ? 0 : "auto",
+            overflowWrap: "break-word",
+            maxWidth: "80%", // Set a maximum width for the chat bubble
           }}
         >
           <Typography>{message}</Typography>
