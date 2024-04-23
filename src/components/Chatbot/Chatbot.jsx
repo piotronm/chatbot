@@ -1,121 +1,190 @@
-import React, { useState } from "react";
-import "../styles/chatbot.css";
+import React, { useState, useEffect } from "react";
+import TextField from "@mui/material/TextField";
+import axios from "axios";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  List,
+  ListItem,
+  ListItemIcon,
+  Box,
+  Typography,
+  Divider,
+} from "@mui/material";
+import { Done } from "@mui/icons-material";
+import { BeatLoader } from "react-spinners";
 
 const Chatbot = () => {
   const [question, setQuestion] = useState("");
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [isEmpty, setIsEmpty] = useState(false); // State variable for input validation
-  const [submitted, setSubmitted] = useState(false); // State variable to track form submission
+  const [isEmpty, setIsEmpty] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    console.log("Response:", response);
+  }, [response]);
 
   const handleQuestionSubmit = (event) => {
     event.preventDefault();
-    setSubmitted(true); // Set submitted to true when the form is submitted
-
-    // Extract the query directly from the state
-    const query = question.trim(); // Remove leading and trailing whitespace
-
+    setSubmitted(true);
+    const query = question.trim();
     if (!query) {
-      // If query is empty, return without making API call
       return;
     }
-
-    // Set loading state to true to show the loading indicator
     setLoading(true);
 
-    // Log the question being sent to the API
-    console.log("Sending data to API:", query);
-
-    // First attempt fetching data from primary API
-    fetch("https://jsonplaceholder.typicode.com/posts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ question: query }),
-    })
+    // POST request
+    console.log("Data sent to the server:", { Query: query });
+    axios
+      .get("data5.txt", { Query: query })
       .then((response) => {
-        if (!response.ok) {
-          // If primary API request fails, attempt fetching data from backup API
-          throw new Error("Primary API request failed");
-        }
-        return response.json();
-      })
-      .then((data) => {
+        const data = response.data;
         console.log("API response received:", data);
-        // Set the response received from the primary API
-        setResponse(data.question); // Extract the question from the response
-        // Clear the input field
-        setQuestion("");
-        // Reset error state
+        setResponse(data);
         setError(null);
       })
       .catch((error) => {
-        console.error("Error:", error);
-        // If primary API request fails, attempt fetching data from backup API
-        console.log("Attempting backup API request...");
-        fetch("/data.json") // Assuming data.json is in the public folder
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Backup API request failed");
-            }
-            return response.json();
-          })
-          .then((data) => {
-            console.log("Backup API response received:", data);
-            // Set the response received from the backup API
-            setResponse(data.body); // Using data.body as an example, you might need to adjust based on the response format
-            // Clear the input field
-            setQuestion("");
-            // Reset error state
-            setError(null);
-          })
-          .catch((error) => {
-            console.error("Backup API Error:", error);
-            setError(
-              "Both primary and backup API requests failed. Please try again later."
-            );
-          });
+        console.error("API Error:", error);
+        setError("Failed to fetch data. Please try again later.");
       })
       .finally(() => {
-        // Set loading state to false when the API request completes
         setLoading(false);
       });
   };
 
   const handleQuestionChange = (event) => {
-    // Check if the input is empty
     const isEmpty = event.target.value.trim() === "";
-    // Update the isEmpty state
     setIsEmpty(isEmpty);
-    // Use to check if input is being logged
-    // console.log("Input value:", event.target.value);
     setQuestion(event.target.value);
   };
 
+  const renderChatMessage = (message, isUser) => {
+    return (
+      <ListItem
+        style={{
+          alignSelf: isUser ? "flex-end" : "flex-start",
+          maxWidth: "70%",
+          marginBottom: "8px",
+        }}
+      >
+        <Box
+          sx={{
+            bgcolor: isUser ? "#2979FF" : "#F0F0F0",
+            color: isUser ? "#FFFFFF" : "#000000",
+            borderRadius: "10px",
+            padding: "8px 12px",
+          }}
+        >
+          <Typography>{message}</Typography>
+        </Box>
+      </ListItem>
+    );
+  };
+
+  const renderContent = () => {
+    if (loading) {
+      return null;
+    }
+
+    if (
+      (submitted && !response) ||
+      (response && response.type === "insight" && !response.content)
+    ) {
+      return <p>No data available</p>;
+    }
+
+    if (response && response.type === "jira") {
+      return (
+        <div>
+          {submitted && renderChatMessage(question, true)}
+          {renderChatMessage(response.content, false)}
+        </div>
+      );
+    }
+
+    if (response && response.type === "insight") {
+      if (
+        response.content ===
+        "Sorry, I am not able to handle the query, please use filter or reach out assistant"
+      ) {
+        return (
+          <div>
+            {submitted && renderChatMessage(question, true)}
+            {renderChatMessage(response.content, false)}
+          </div>
+        );
+      } else {
+        const content = JSON.parse(response.content);
+        const keys = Object.keys(content);
+        const values = Object.values(content);
+
+        return (
+          <div>
+            {submitted && renderChatMessage(question, true)}
+            {renderChatMessage("Here are the insights:", false)}
+            <TableContainer component={Paper}>
+              <Table aria-label="Insights table">
+                <TableBody>
+                  {keys.map((key, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{key}</TableCell>
+                      <TableCell>
+                        <List>
+                          {Object.entries(values[index]).map(
+                            ([innerKey, innerValue]) => (
+                              <ListItem key={innerKey}>
+                                <ListItemIcon>
+                                  <Done />
+                                </ListItemIcon>
+                                {innerValue}
+                              </ListItem>
+                            )
+                          )}
+                        </List>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
+        );
+      }
+    }
+  };
+
   return (
-    <div className="chatbot-container">
-      <form className="chatbot-form" onSubmit={handleQuestionSubmit}>
-        <input
-          className="chatbot-input"
-          type="text"
-          value={question}
+    <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
+      <List>{renderContent()}</List>
+      <Divider />
+      <Box
+        component="form"
+        onSubmit={handleQuestionSubmit}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          marginTop: "20px",
+        }}
+      >
+        <TextField
+          fullWidth
+          id="standard-search"
+          label="Enter Your Question Here"
           onChange={handleQuestionChange}
-          placeholder="Enter your question or query"
+          type="text"
+          variant="standard"
+          maxLength={250}
         />
-        <button className="chatbot-submit" type="submit">
-          Submit
-        </button>
-      </form>
-      {loading && <p className="chatbot-loading"></p>}{" "}
-      {/* Display error message if input is empty */}
-      {isEmpty && submitted && (
-        <p className="chatbot-error">Please enter a question</p>
-      )}{" "}
-      {/* Display error message if input is empty and form submitted */}
-      {error && <p className="chatbot-error">{error}</p>}
-      {response && <p className="chatbot-response">{response}</p>}
+      </Box>
+      {loading && <BeatLoader color="blue" />}
+      {error && <p>{error}</p>}
+      {submitted && isEmpty && <p>Please enter a question.</p>}
     </div>
   );
 };
