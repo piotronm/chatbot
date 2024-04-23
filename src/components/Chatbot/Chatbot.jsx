@@ -43,7 +43,7 @@ const Chatbot = () => {
     // POST request
     console.log("Data sent to the server:", { Query: query });
     axios
-      .get("data4.txt", { Query: query })
+      .get("data5.txt", { Query: query })
       .then((response) => {
         const data = response.data;
         console.log("API response received:", data);
@@ -108,9 +108,7 @@ const Chatbot = () => {
       <List>
         {responseHistory.map((entry, index) => (
           <div key={index}>
-            {entry.response.type === "insight" &&
-              entry.response.content !==
-                "Sorry, I am not able to handle the query, please use filter or reach out assistant" &&
+            {entry.response.type === "jira" &&
               renderChatMessage(entry.question, true)}
             {entry.response.type === "jira" ? (
               <ListItem
@@ -137,41 +135,49 @@ const Chatbot = () => {
                 {entry.response.type === "insight" && (
                   <div>
                     {entry.response.content ===
-                      "Sorry, I am not able to handle the query, please use filter or reach out assistant" &&
-                      renderChatMessage(entry.response.content, false)}
+                      "Sorry, I am not able to handle the query, please use filter or reach out assistant" && (
+                      <div>
+                        {renderChatMessage(entry.question, true)}
+                        {renderChatMessage(entry.response.content, false)}
+                      </div>
+                    )}
                     {entry.response.content !==
-                      "Sorry, I am not able to handle the query, please use filter or reach out assistant" &&
-                      renderChatMessage(
-                        "Here is the Client Insight data:",
-                        false
-                      )}
-                    <TableContainer component={Paper}>
-                      <Table aria-label="Insights table">
-                        <TableBody>
-                          {Object.entries(
-                            JSON.parse(entry.response.content)
-                          ).map(([key, value], i) => (
-                            <TableRow key={i}>
-                              <TableCell>{key}</TableCell>
-                              <TableCell>
-                                <List>
-                                  {Object.entries(value).map(
-                                    ([innerKey, innerValue], j) => (
-                                      <ListItem key={j}>
-                                        <ListItemIcon>
-                                          <Done />
-                                        </ListItemIcon>
-                                        {innerValue}
-                                      </ListItem>
-                                    )
-                                  )}
-                                </List>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
+                      "Sorry, I am not able to handle the query, please use filter or reach out assistant" && (
+                      <div>
+                        {renderChatMessage(entry.question, true)}
+                        {renderChatMessage(
+                          "Here is the Client Insight data:",
+                          false
+                        )}
+                        <TableContainer component={Paper}>
+                          <Table aria-label="Insights table">
+                            <TableBody>
+                              {Object.entries(
+                                JSON.parse(entry.response.content)
+                              ).map(([key, value], i) => (
+                                <TableRow key={i}>
+                                  <TableCell>{key}</TableCell>
+                                  <TableCell>
+                                    <List>
+                                      {Object.entries(value).map(
+                                        ([innerKey, innerValue], j) => (
+                                          <ListItem key={j}>
+                                            <ListItemIcon>
+                                              <Done />
+                                            </ListItemIcon>
+                                            {innerValue}
+                                          </ListItem>
+                                        )
+                                      )}
+                                    </List>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
