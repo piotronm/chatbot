@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import TextField from "@mui/material/TextField";
 import axios from "axios";
 import {
@@ -28,9 +28,11 @@ const Chatbot = () => {
   const [error, setError] = useState(null);
   const [isEmpty, setIsEmpty] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const bottomRef = useRef(null);
 
   useEffect(() => {
     console.log("Response History:", responseHistory);
+    scrollToBottom();
   }, [responseHistory]);
 
   const handleQuestionSubmit = (event) => {
@@ -73,9 +75,14 @@ const Chatbot = () => {
     setQuestion(event.target.value);
   };
 
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: "auto" });
+  };
+
   const renderChatMessage = (message, isUser) => {
     return (
       <ListItem
+        ref={bottomRef}
         style={{
           alignSelf: isUser ? "flex-end" : "flex-start",
           marginBottom: "8px",
