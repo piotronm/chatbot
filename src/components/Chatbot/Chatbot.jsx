@@ -42,7 +42,7 @@ const Chatbot = () => {
     // POST request
     console.log("Data sent to the server:", { Query: query });
     axios
-      .get("data5.txt", { Query: query })
+      .get("data3.json", { Query: query })
       .then((response) => {
         const data = response.data;
         console.log("API response received:", data);
@@ -69,7 +69,6 @@ const Chatbot = () => {
       <ListItem
         style={{
           alignSelf: isUser ? "flex-end" : "flex-start",
-          maxWidth: "70%",
           marginBottom: "8px",
         }}
       >
@@ -79,6 +78,9 @@ const Chatbot = () => {
             color: isUser ? "#FFFFFF" : "#000000",
             borderRadius: "10px",
             padding: "8px 12px",
+            // Align user message to the right
+            marginLeft: isUser ? "auto" : 0,
+            marginRight: isUser ? 0 : "auto",
           }}
         >
           <Typography>{message}</Typography>
@@ -100,10 +102,35 @@ const Chatbot = () => {
     }
 
     if (response && response.type === "jira") {
+      const sentences = response.content.split(".");
+      const filteredSentences = sentences.filter(
+        (sentence) => sentence.trim() !== ""
+      );
+
       return (
         <div>
           {submitted && renderChatMessage(question, true)}
-          {renderChatMessage(response.content, false)}
+          <ListItem
+            style={{
+              alignSelf: "flex-start",
+              marginBottom: "8px",
+            }}
+          >
+            <Box
+              sx={{
+                bgcolor: "#F0F0F0",
+                color: "#000000",
+                borderRadius: "10px",
+                padding: "8px 12px",
+              }}
+            >
+              {filteredSentences.map((sentence, index) => (
+                <div key={index}>
+                  <Typography>{sentence.trim()}</Typography>
+                </div>
+              ))}
+            </Box>
+          </ListItem>
         </div>
       );
     }
@@ -127,7 +154,7 @@ const Chatbot = () => {
         return (
           <div>
             {submitted && renderChatMessage(question, true)}
-            {renderChatMessage("Here are the insights:", false)}
+            {renderChatMessage("Here is the Client Insight data:", false)}
             <TableContainer component={Paper}>
               <Table aria-label="Insights table">
                 <TableBody>
