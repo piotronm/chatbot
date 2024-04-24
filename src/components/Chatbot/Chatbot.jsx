@@ -13,7 +13,6 @@ import {
   ListItem,
   Box,
   Typography,
-  Divider,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
@@ -217,41 +216,39 @@ const Chatbot = () => {
   return (
     <div
       style={{
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: "100vh",
-        overflowY: "auto",
+        width: "400px", // Set a fixed width for the app
+        border: "1px solid #ccc", // Soft border around the app
+        borderRadius: "8px",
+        margin: "auto", // Center the app horizontally
+        overflow: "hidden", // Hide overflow content
       }}
     >
-      <Box
-        sx={{
-          border: "1px solid rgba(0, 0, 0, 0.12)",
-          borderRadius: "8px",
+      {/* Chat content container */}
+      <div
+        style={{
+          maxHeight: "calc(100vh - 100px)", // Reserve space for input form
+          overflowY: "auto", // Enable vertical scrollbar if needed
           padding: "20px",
-          maxWidth: "600px",
-          margin: "auto",
-          position: "relative", // Ensure positioning context
         }}
       >
         {/* Render chat history */}
         {renderContent()}
-
-        {/* Form for submitting questions */}
-        <Divider />
-        <Box
-          component="form"
+        {/* Dummy content to test scrollbar */}
+        {/* <div style={{ height: "1000px" }}></div> */}
+      </div>
+      {/* Input form container */}
+      <div
+        style={{
+          borderTop: "1px solid #ccc", // Soft border at the top of input form
+          padding: "10px 20px",
+          display: "flex",
+          alignItems: "center",
+          backgroundColor: "#fff",
+        }}
+      >
+        <form
           onSubmit={handleQuestionSubmit}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            marginTop: "20px",
-            position: "sticky",
-            bottom: 0,
-            backgroundColor: "#fff",
-            padding: "10px",
-          }}
+          style={{ width: "100%", marginRight: "10px" }}
         >
           <TextField
             fullWidth
@@ -260,44 +257,39 @@ const Chatbot = () => {
             value={question}
             onChange={handleQuestionChange}
             type="text"
-            variant="outlined" // Change variant to "outlined" for a more contrasting border
+            variant="outlined"
             maxLength={250}
             sx={{
               "& .MuiOutlinedInput-root": {
-                // Target the root element of the outlined input
                 "& fieldset": {
-                  // Style the fieldset, which is the border
-                  borderColor: "rgba(0, 0, 0, 0.23)", // Change border color
+                  borderColor: "rgba(0, 0, 0, 0.23)",
                 },
                 "&:hover fieldset": {
-                  // Style the fieldset on hover
-                  borderColor: "rgba(0, 0, 0, 0.45)", // Change border color on hover
+                  borderColor: "rgba(0, 0, 0, 0.45)",
                 },
                 "&.Mui-focused fieldset": {
-                  // Style the fieldset when focused
-                  borderColor: "#2979FF", // Change border color when focused
+                  borderColor: "#2979FF",
                 },
               },
             }}
           />
-
-          {loading && (
-            <div style={{ marginLeft: "10px" }}>
-              <CircularProgress color="primary" />
-            </div>
-          )}
-        </Box>
-
-        {/* Error and submission feedback */}
-        {error && <p>{error}</p>}
-        {submitted && isEmpty && <p>Please enter a question.</p>}
-        {error && (
-          <Alert severity="error" style={{ marginBottom: "20px" }}>
-            <AlertTitle>Error</AlertTitle>
-            Failed to fetch data. Please try again later.
-          </Alert>
-        )}
-      </Box>
+        </form>
+        {/* Spinner container */}
+        {loading && <CircularProgress color="primary" />}
+      </div>
+      {/* Display error and submission feedback */}
+      {error && (
+        <Alert severity="error" style={{ margin: "10px 20px" }}>
+          <AlertTitle>Error</AlertTitle>
+          Failed to fetch data. Please try again later.
+        </Alert>
+      )}
+      {submitted && isEmpty && (
+        <Alert severity="warning" style={{ margin: "10px 20px" }}>
+          <AlertTitle>Warning</AlertTitle>
+          Please enter a question.
+        </Alert>
+      )}
     </div>
   );
 };
