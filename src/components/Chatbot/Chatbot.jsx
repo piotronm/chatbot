@@ -81,37 +81,34 @@ const Chatbot = () => {
   };
 
   const renderChatMessage = (message, isUser) => {
+    const messageStyle = {
+      alignSelf: isUser ? "flex-end" : "flex-start",
+      marginBottom: "8px",
+    };
+
+    const bubbleStyle = {
+      bgcolor: isUser ? "#2979FF" : "#F0F0F0",
+      color: isUser ? "#ffffff" : "#000000", // Change user text color to black
+      borderRadius: "10px",
+      padding: "8px 12px",
+      marginLeft: isUser ? "auto" : 0,
+      marginRight: isUser ? 0 : "auto",
+      overflowWrap: "break-word",
+      maxWidth: "80%", // Set a maximum width for the chat bubble
+    };
+
     return (
-      <ListItem
-        ref={bottomRef}
-        style={{
-          alignSelf: isUser ? "flex-end" : "flex-start",
-          marginBottom: "8px",
-        }}
-      >
-        <Box
-          sx={{
-            bgcolor: isUser ? "#2979FF" : "#F0F0F0",
-            color: isUser ? "#FFFFFF" : "#000000",
-            borderRadius: "10px",
-            padding: "8px 12px",
-            marginLeft: isUser ? "auto" : 0,
-            marginRight: isUser ? 0 : "auto",
-            overflowWrap: "break-word",
-            maxWidth: "80%", // Set a maximum width for the chat bubble
-          }}
-        >
-          <Typography variant="body1">{message}</Typography>
+      <ListItem ref={bottomRef} style={messageStyle}>
+        <Box sx={bubbleStyle}>
+          <Typography variant="body1" sx={{ fontWeight: isUser ? 500 : 400 }}>
+            {message}
+          </Typography>
         </Box>
       </ListItem>
     );
   };
 
   const renderContent = () => {
-    if (submitted && responseHistory.length === 0) {
-      return <p>No data available</p>;
-    }
-
     return (
       <List>
         {responseHistory.map((entry, index) => (
