@@ -216,6 +216,7 @@ const Chatbot = () => {
   return (
     <div
       style={{
+        height: "calc(100vh - 20px)", // Set the height to 100% of viewport height minus 20px (adjust as needed)
         width: "400px", // Set a fixed width for the app
         border: "1px solid #ccc", // Soft border around the app
         borderRadius: "8px",
@@ -223,6 +224,11 @@ const Chatbot = () => {
         overflow: "hidden", // Hide overflow content
       }}
     >
+      <img
+        src="/Merrill_Lynch.png"
+        alt="logo"
+        style={{ width: "100%", marginBottom: "15px" }}
+      />
       {/* Chat content container */}
       <div
         style={{
