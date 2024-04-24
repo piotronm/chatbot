@@ -177,39 +177,26 @@ const Chatbot = () => {
                               </TableRow>
                             </TableHead>
                             <TableBody>
-                              {Object.values(
-                                JSON.parse(entry.response.content)
-                              ).map((value, i) => (
+                              {/* Render a row for each content */}
+                              {[...Array(2)].map((_, i) => (
                                 <TableRow key={i}>
-                                  {Array.isArray(value)
-                                    ? // If value is an array, render each element
-                                      value.map((content, j) => (
-                                        <TableCell
-                                          key={j}
-                                          sx={{
-                                            border:
-                                              "1px solid rgba(0, 0, 0, 0.12)",
-                                            padding: "8px",
-                                            color: "#555555",
-                                          }}
-                                        >
-                                          {content}
-                                        </TableCell>
-                                      ))
-                                    : // If value is an object, render each key-value pair
-                                      Object.values(value).map((content, j) => (
-                                        <TableCell
-                                          key={j}
-                                          sx={{
-                                            border:
-                                              "1px solid rgba(0, 0, 0, 0.12)",
-                                            padding: "8px",
-                                            color: "#555555",
-                                          }}
-                                        >
-                                          {content}
-                                        </TableCell>
-                                      ))}
+                                  {Object.values(
+                                    JSON.parse(entry.response.content)
+                                  ).map((value, j) => (
+                                    <TableCell
+                                      key={j}
+                                      sx={{
+                                        border: "1px solid rgba(0, 0, 0, 0.12)",
+                                        padding: "8px",
+                                        color: "#555555",
+                                      }}
+                                    >
+                                      {/* Check if value is an array or object */}
+                                      {Array.isArray(value)
+                                        ? value[i]
+                                        : Object.values(value)[i]}
+                                    </TableCell>
+                                  ))}
                                 </TableRow>
                               ))}
                             </TableBody>
