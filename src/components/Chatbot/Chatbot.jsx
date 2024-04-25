@@ -54,7 +54,8 @@ const Chatbot = () => {
       query.toLowerCase().includes("hub") ||
       query.toLowerCase().includes("comm") ||
       query.toLowerCase().includes("show hub") ||
-      query.toLowerCase().includes("show comm hub")
+      query.toLowerCase().includes("show comm hub") ||
+      query.toLowerCase().includes("com")
     ) {
       setShowCommHubButtons(true);
       setQuestion("");
@@ -66,7 +67,7 @@ const Chatbot = () => {
 
     setTimeout(() => {
       axios
-        .get("Jira.txt", { Query: query })
+        .get("data.txt", { Query: query })
         .then((response) => {
           const data = response.data;
           console.log("API response received:", data);
@@ -177,7 +178,7 @@ const Chatbot = () => {
       <div
         style={{
           position: "absolute",
-          bottom: "10px", // Adjust this value as needed
+          bottom: "10px",
           left: "50%",
           transform: "translateX(-50%)",
           zIndex: 1,
