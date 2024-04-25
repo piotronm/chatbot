@@ -44,7 +44,7 @@ const Chatbot = () => {
 
     setTimeout(() => {
       axios
-        .get("data5.txt", { Query: query })
+        .get("InsightName.txt", { Query: query })
         .then((response) => {
           const data = response.data;
           console.log("API response received:", data);
@@ -126,8 +126,11 @@ const Chatbot = () => {
                     padding: "8px 12px",
                   }}
                 >
+                  {/* Splitting the content by lines and rendering each line with its index */}
                   {entry.response.content.split(".").map((sentence, i) => (
-                    <Typography key={i}>{sentence.trim()}</Typography>
+                    <Typography key={i}>
+                      {i + 1}. {sentence.trim()}
+                    </Typography>
                   ))}
                 </Box>
               </ListItem>
@@ -220,11 +223,12 @@ const Chatbot = () => {
         borderRadius: "8px",
         margin: "auto",
         overflow: "hidden",
+        position: "relative",
       }}
     >
       <div
         style={{
-          maxHeight: "calc(100vh - 100px)",
+          maxHeight: "calc(100vh - 200px)",
           overflowY: "auto",
           padding: "20px",
         }}
@@ -238,11 +242,15 @@ const Chatbot = () => {
           display: "flex",
           alignItems: "center",
           backgroundColor: "#fff",
+          position: "absolute",
+          bottom: 0,
+          width: "100%",
+          boxSizing: "border-box",
         }}
       >
         <form
           onSubmit={handleQuestionSubmit}
-          style={{ width: "100%", marginRight: "10px" }}
+          style={{ flex: "1", marginRight: "10px", minWidth: 0 }}
         >
           <TextField
             fullWidth
@@ -268,7 +276,9 @@ const Chatbot = () => {
             }}
           />
         </form>
-        {loading && <CircularProgress color="primary" />}
+        <div style={{ minWidth: 0 }}>
+          {loading && <CircularProgress color="primary" />}
+        </div>
       </div>
       {error && (
         <Alert severity="error" style={{ margin: "10px 20px" }}>
