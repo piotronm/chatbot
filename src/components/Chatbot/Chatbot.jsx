@@ -12,10 +12,12 @@ import {
   List,
   ListItem,
   Box,
+  Button,
   Typography,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
+import { useTheme } from "@mui/material/styles";
 import AlertTitle from "@mui/material/AlertTitle";
 
 const Chatbot = () => {
@@ -25,6 +27,7 @@ const Chatbot = () => {
   const [error, setError] = useState(null);
   const [isEmpty, setIsEmpty] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [showCommHubButtons, setShowCommHubButtons] = useState(false);
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -39,6 +42,25 @@ const Chatbot = () => {
       setIsEmpty(true);
       return;
     }
+
+    if (
+      query.toLowerCase().includes("show me comm hub") ||
+      query.toLowerCase().includes("comm hub") ||
+      query.toLowerCase().includes("bring me to comm hub") ||
+      query.toLowerCase().includes("com hub") ||
+      query.toLowerCase().includes("communication hub") ||
+      query.toLowerCase().includes("bring me to communication hub") ||
+      query.toLowerCase().includes("cew comm hub") ||
+      query.toLowerCase().includes("hub") ||
+      query.toLowerCase().includes("comm") ||
+      query.toLowerCase().includes("show hub") ||
+      query.toLowerCase().includes("show comm hub")
+    ) {
+      setShowCommHubButtons(true);
+      setQuestion("");
+      return;
+    }
+
     setSubmitted(true);
     setLoading(true);
 
@@ -64,6 +86,13 @@ const Chatbot = () => {
           setIsEmpty(false);
         });
     }, 2000);
+  };
+
+  const handleYesButtonClick = () => {
+    window.open("https://example.com/commhub", "_blank");
+  };
+  const handleNoButtonClick = () => {
+    setShowCommHubButtons(false); // Hide the CommHub buttons
   };
 
   const handleQuestionChange = (event) => {
@@ -102,6 +131,65 @@ const Chatbot = () => {
         </Box>
       </ListItem>
     );
+  };
+  const CommHubButtons = ({ handleYesButtonClick, handleNoButtonClick }) => {
+    const theme = useTheme();
+
+    return (
+      <div style={{ textAlign: "center" }}>
+        <Typography variant="body1" style={{ marginBottom: 10 }}>
+          Would you like to navigate to Comm Hub?
+        </Typography>
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.common.white,
+            "&:hover": {
+              backgroundColor: theme.palette.primary.dark,
+            },
+          }}
+          onClick={handleYesButtonClick}
+        >
+          YES
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: theme.palette.grey[700],
+            color: theme.palette.common.white,
+            "&:hover": {
+              backgroundColor: theme.palette.grey[800],
+            },
+          }}
+          style={{ marginLeft: 10 }}
+          onClick={handleNoButtonClick}
+        >
+          NO
+        </Button>
+      </div>
+    );
+  };
+
+  const renderCommHubButtons = () => {
+    return showCommHubButtons ? (
+      <div
+        style={{
+          textAlign: "center",
+          position: "absolute",
+          bottom: "85px", // Adjust this value as needed
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 1,
+          width: "100%",
+        }}
+      >
+        <CommHubButtons
+          handleYesButtonClick={handleYesButtonClick}
+          handleNoButtonClick={handleNoButtonClick}
+        />
+      </div>
+    ) : null;
   };
 
   const renderContent = () => {
@@ -180,7 +268,6 @@ const Chatbot = () => {
                               </TableRow>
                             </TableHead>
                             <TableBody>
-                              {/* Transpose the data */}
                               {[...Array(2)].map((_, i) => (
                                 <TableRow key={i}>
                                   {Object.values(
@@ -235,6 +322,7 @@ const Chatbot = () => {
       >
         {renderContent()}
       </div>
+      {showCommHubButtons && renderCommHubButtons()}
       <div
         style={{
           borderTop: "1px solid #ccc",
