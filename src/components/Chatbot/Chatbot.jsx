@@ -66,7 +66,7 @@ const Chatbot = () => {
 
     setTimeout(() => {
       axios
-        .get("InsightName.txt", { Query: query })
+        .get("Jira.txt", { Query: query })
         .then((response) => {
           const data = response.data;
           console.log("API response received:", data);
@@ -90,6 +90,7 @@ const Chatbot = () => {
 
   const handleYesButtonClick = () => {
     window.open("https://example.com/commhub", "_blank");
+    setShowCommHubButtons(false); // Hide the CommHub buttons
   };
   const handleNoButtonClick = () => {
     setShowCommHubButtons(false); // Hide the CommHub buttons
@@ -175,9 +176,8 @@ const Chatbot = () => {
     return showCommHubButtons ? (
       <div
         style={{
-          textAlign: "center",
           position: "absolute",
-          bottom: "85px", // Adjust this value as needed
+          bottom: "10px", // Adjust this value as needed
           left: "50%",
           transform: "translateX(-50%)",
           zIndex: 1,
@@ -301,41 +301,9 @@ const Chatbot = () => {
     );
   };
 
-  return (
-    <div
-      style={{
-        height: "calc(100vh - 20px)",
-        width: "400px",
-        border: "1px solid #ccc",
-        borderRadius: "8px",
-        margin: "auto",
-        overflow: "hidden",
-        position: "relative",
-      }}
-    >
-      <div
-        style={{
-          maxHeight: "calc(100vh - 200px)",
-          overflowY: "auto",
-          padding: "20px",
-        }}
-      >
-        {renderContent()}
-      </div>
-      {showCommHubButtons && renderCommHubButtons()}
-      <div
-        style={{
-          borderTop: "1px solid #ccc",
-          padding: "10px 20px",
-          display: "flex",
-          alignItems: "center",
-          backgroundColor: "#fff",
-          position: "absolute",
-          bottom: 0,
-          width: "100%",
-          boxSizing: "border-box",
-        }}
-      >
+  const renderInputBox = () => {
+    return (
+      !showCommHubButtons && (
         <form
           onSubmit={handleQuestionSubmit}
           style={{ flex: "1", marginRight: "10px", minWidth: 0 }}
@@ -364,6 +332,46 @@ const Chatbot = () => {
             }}
           />
         </form>
+      )
+    );
+  };
+
+  return (
+    <div
+      style={{
+        height: "calc(100vh - 20px)",
+        width: "400px",
+        border: "1px solid #ccc",
+        borderRadius: "8px",
+        margin: "auto",
+        overflow: "hidden",
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          maxHeight: "calc(100vh - 200px)",
+          overflowY: "auto",
+          padding: "20px",
+        }}
+      >
+        {renderContent()}
+      </div>
+      {renderCommHubButtons()}
+      <div
+        style={{
+          borderTop: "1px solid #ccc",
+          padding: "10px 20px",
+          alignItems: "center",
+          backgroundColor: "#fff",
+          position: "absolute",
+          bottom: 0,
+          width: "100%",
+          boxSizing: "border-box",
+          display: showCommHubButtons ? "none" : "flex",
+        }}
+      >
+        {renderInputBox()}
         <div style={{ minWidth: 0 }}>
           {loading && <CircularProgress color="primary" />}
         </div>
