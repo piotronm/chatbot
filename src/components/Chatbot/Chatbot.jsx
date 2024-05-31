@@ -44,17 +44,9 @@ const Chatbot = () => {
     }
 
     if (
-      query.toLowerCase().includes("show me comm hub") ||
-      query.toLowerCase().includes("comm hub") ||
-      query.toLowerCase().includes("bring me to comm hub") ||
-      query.toLowerCase().includes("com hub") ||
-      query.toLowerCase().includes("communication hub") ||
-      query.toLowerCase().includes("bring me to communication hub") ||
-      query.toLowerCase().includes("cew comm hub") ||
       query.toLowerCase().includes("hub") ||
       query.toLowerCase().includes("comm") ||
-      query.toLowerCase().includes("show hub") ||
-      query.toLowerCase().includes("show comm hub") ||
+      query.toLowerCase().includes("communication") ||
       query.toLowerCase().includes("com")
     ) {
       setShowCommHubButtons(true);
@@ -65,9 +57,16 @@ const Chatbot = () => {
     setSubmitted(true);
     setLoading(true);
 
+    let fileToFetch = "sorry.txt"; // Default file
+    if (query.toLowerCase() === "hello, nice to meet you") {
+      fileToFetch = "data.txt";
+    } else if (query.toLowerCase() === "goodbye") {
+      fileToFetch = "jira.txt";
+    }
+
     setTimeout(() => {
       axios
-        .get("data.txt", { Query: query })
+        .get(fileToFetch, { Query: query })
         .then((response) => {
           const data = response.data;
           console.log("API response received:", data);
@@ -90,7 +89,7 @@ const Chatbot = () => {
   };
 
   const handleYesButtonClick = () => {
-    window.open("https://example.com/commhub", "_blank");
+    window.open("https://example.com/commhub", "Comm Hub");
     setShowCommHubButtons(false); // Hide the CommHub buttons
   };
   const handleNoButtonClick = () => {
@@ -215,12 +214,7 @@ const Chatbot = () => {
                     padding: "8px 12px",
                   }}
                 >
-                  {/* Splitting the content by lines and rendering each line with its index */}
-                  {entry.response.content.split(".").map((sentence, i) => (
-                    <Typography key={i}>
-                      {i + 1}. {sentence.trim()}
-                    </Typography>
-                  ))}
+                  <Typography>{entry.response.content}</Typography>
                 </Box>
               </ListItem>
             ) : (
