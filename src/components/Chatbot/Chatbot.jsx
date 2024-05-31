@@ -57,11 +57,19 @@ const Chatbot = () => {
     setSubmitted(true);
     setLoading(true);
 
-    let fileToFetch = "sorry.txt"; // Default file
-    if (query.toLowerCase() === "hello, nice to meet you") {
-      fileToFetch = "data.txt";
-    } else if (query.toLowerCase() === "goodbye") {
+    let fileToFetch = "sorry.txt";
+    if (
+      query.toLowerCase() ===
+      "show me all of the insights that belong to mitsuko honda"
+    ) {
+      fileToFetch = "ClientName.txt";
+    } else if (query.toLowerCase() === "i am not able to launch cew") {
       fileToFetch = "jira.txt";
+    } else if (
+      query.toLowerCase() ===
+      "show me a list of all my clients where the insight name is "
+    ) {
+      fileToFetch = "InsightName.txt";
     }
 
     setTimeout(() => {
